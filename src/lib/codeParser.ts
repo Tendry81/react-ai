@@ -9,88 +9,44 @@ export interface FileNode {
 
 export const parseCodeResponse = (content: string): FileNode[] => {
     const files: FileNode[] = [];
-    const lines = content.split('\n');
-    let currentFile: FileNode | null = null;
+    let currentSection: string | null = null;
     let currentContent: string[] = [];
 
-    for (const line of lines) {
-        // Detect file headers like: // src/components/Button.tsx
-        const fileMatch = line.match(/^\/\/\s*(.+\.(tsx?|jsx?|css|json|md|html))/);
+    const lines = content.split('\n');
 
-        if (fileMatch) {
-            // Save previous file if exists
-            if (currentFile) {
-                currentFile.content = currentContent.join('\n');
-                files.push(currentFile);
+    for (const line of lines) {
+        // Detect Markdown headers
+        const headerMatch = line.match(/^#\s+(.+)/);
+
+        if (headerMatch) {
+            // Save previous section if exists
+            if (currentSection) {
+                files.push({
+                    name: `${currentSection}.md`,
+                    path: `${currentSection.toLowerCase()}.md`,
+                    type: 'file',
+                    language: 'markdown',
+                    content: currentContent.join('\n')
+                });
                 currentContent = [];
             }
 
-            const fullPath = fileMatch[1];
-            const pathParts = fullPath.split('/');
-            const fileName = pathParts.pop() || '';
-            const extension = fileName.split('.').pop() || '';
-
-            currentFile = {
-                name: fileName,
-                path: fullPath,
-                type: 'file',
-                language: getLanguageFromExtension(extension),
-            };
-        } else if (currentFile) {
+            currentSection = headerMatch[1];
+        } else if (currentSection) {
             currentContent.push(line);
         }
     }
 
-    // Add the last file
-    if (currentFile) {
-        currentFile.content = currentContent.join('\n');
-        files.push(currentFile);
+    // Add the last section
+    if (currentSection && currentContent.length > 0) {
+        files.push({
+            name: `${currentSection}.md`,
+            path: `${currentSection.toLowerCase()}.md`,
+            type: 'file',
+            language: 'markdown',
+            content: currentContent.join('\n')
+        });
     }
 
-    // Convert flat files to tree structure
-    return buildFileTree(files);
-};
-
-const getLanguageFromExtension = (ext: string): string => {
-    const extensions: Record<string, string> = {
-        'js': 'javascript',
-        'ts': 'typescript',
-        'jsx': 'javascript',
-        'tsx': 'typescript',
-        'css': 'css',
-        'html': 'html',
-        'json': 'json',
-        'md': 'markdown',
-    };
-    return extensions[ext] || 'plaintext';
-};
-
-const buildFileTree = (files: FileNode[]): FileNode[] => {
-    const root: FileNode = { name: '', path: '', type: 'directory', children: [] };
-
-    files.forEach((file) => {
-        const pathParts = file.path.split('/');
-        let currentLevel = root;
-
-        for (let i = 0; i < pathParts.length - 1; i++) {
-            const part = pathParts[i];
-            let found = currentLevel.children?.find((child) => child.name === part);
-
-            if (!found) {
-                found = {
-                    name: part,
-                    path: pathParts.slice(0, i + 1).join('/'),
-                    type: 'directory',
-                    children: [],
-                };
-                currentLevel.children?.push(found);
-            }
-
-            currentLevel = found;
-        }
-
-        currentLevel.children?.push(file);
-    });
-
-    return root.children || [];
+    return files;
 };
