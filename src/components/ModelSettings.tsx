@@ -10,7 +10,8 @@ const ModelSettings: React.FC = () => {
         temperature,
         setTemperature,
         maxTokens,
-        setMaxTokens
+        setMaxTokens,
+        availableModels
     } = useAppContext();
 
     return (
@@ -23,16 +24,20 @@ const ModelSettings: React.FC = () => {
             </h3>
             <div className="space-y-4">
                 <div>
+                    {JSON.stringify(availableModels)}
                     <label className="block text-sm font-medium text-gray-300 mb-2">Model</label>
                     <select
                         value={model}
                         onChange={(e) => setModel(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
-                        <option value="meta-llama/Llama-3.1-70B-Instruct-Turbo">Llama 3.1 70B (Recommended)</option>
-                        <option value="meta-llama/Llama-3.1-8B-Instruct-Turbo">Llama 3.1 8B (Fast)</option>
-                        <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral 8x7B</option>
-                        <option value="codellama/CodeLlama-34b-Instruct-hf">CodeLlama 34B</option>
+                        {availableModels && availableModels.length > 0 &&
+                            availableModels.map((m) => (
+                                <option key={m.id} value={m.id}>
+                                    {m.name} ({m.id})
+                                </option>
+                            ))
+                        }
                     </select>
                 </div>
                 <div>

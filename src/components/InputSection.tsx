@@ -64,6 +64,7 @@ const InputSection: React.FC = () => {
 
             // Parse files from the response
             const parsedFiles = parseCodeResponse(result.content);
+            console.log(parsedFiles)
             setFiles(parsedFiles);
         } catch (error) {
             console.error('Error:', error);

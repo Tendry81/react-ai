@@ -1,13 +1,14 @@
 'use client';
 
 import { useAppContext } from '@/context/AppContext';
+import { Settings } from 'lucide-react'; // Add this import
 import React, { useState } from 'react';
 import ModelSettings from './ModelSettings';
-import QuickActions from './QuickActions';
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC = ({ children }: { children: React.ReactNode }) => {
     const { apiKey, setApiKey, validateApiKey } = useAppContext();
     const [apiStatus, setApiStatus] = useState('');
+    const [showModelSettings, setShowModelSettings] = useState(false); // Add this state
 
     const handleValidate = async () => {
         setApiStatus('Validating...');
@@ -21,53 +22,39 @@ const Sidebar: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6 w-full">
-            <ModelSettings />
-
-            <div className="bg-black/20 backdrop-blur-lg rounded-xl border border-white/10 p-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                    </svg>
-                    API Key
-                </h3>
-                <div className="space-y-3">
-                    <div className="flex gap-2">
-                        <input
-                            type="password"
-                            value={apiKey}
-                            onChange={(e) => setApiKey(e.target.value)}
-                            placeholder="Enter your Together.ai API key"
-                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                        <button
-                            onClick={handleValidate}
-                            className="px-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-                        >
-                            Validate
-                        </button>
-                    </div>
-                    {apiStatus && (
-                        <div className={`text-xs ${apiStatus.includes('valid') ? 'text-green-400' :
-                                apiStatus.includes('Invalid') ? 'text-red-400' : 'text-yellow-400'
-                            }`}>
-                            {apiStatus}
-                        </div>
-                    )}
-                    <p className="text-xs text-gray-400">
-                        Get your API key from <a
-                            href="https://together.ai"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-purple-400 hover:text-purple-300 underline"
-                        >
-                            together.ai
-                        </a>
-                    </p>
-                </div>
+        <div className="flex flex-col h-full">
+            <div className="flex-1 space-y-6 w-full">
+                {children}
             </div>
 
-            <QuickActions />
+            {/* Model Settings Button */}
+            <button
+                onClick={() => setShowModelSettings(true)}
+                className="w-full mt-4 p-3 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-b-lg transition-colors"
+            >
+                <Settings className="w-4 h-4" />
+                <span>Model Settings</span>
+            </button>
+
+            {/* Model Settings Modal */}
+            {showModelSettings && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="bg-gray-900 rounded-xl border border-white/10 p-6 max-w-md w-full mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-white">Model Settings</h3>
+                            <button
+                                onClick={() => setShowModelSettings(false)}
+                                className="text-gray-400 hover:text-white"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <ModelSettings />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

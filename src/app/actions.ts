@@ -2,7 +2,6 @@
 
 import { Message } from '@/types/types';
 import Together from 'together-ai';
-import { ModelListResponse } from 'together-ai/src/resources.js';
 
 export const sendMessage = async (data: {
     messages: Message[];
@@ -15,7 +14,7 @@ export const sendMessage = async (data: {
         const together = new Together({
             apiKey: data.apiKey,
         });
-        console.log('Sending message to Together', data)
+        console.log('Sending message ', data);
         data.messages.push({
             'role': 'system',
             'content': `You are a senior developer specialized *exclusively* in React 18+ and Next.js 14+ using the App Router. Your task is to generate a **fully functional, production-grade solution** strictly formatted in a single Markdown file. Adhere to the following structure and constraints:
@@ -81,6 +80,7 @@ export const validateApi = async (apiKey: string): Promise<boolean> => {
 };
 
 interface TogetherModel {
+    display_name: any;
     id: string;
     name: string;
     object: string;
@@ -96,20 +96,25 @@ export const getAvailableModels = async (apiKey: string): Promise<{ data: Togeth
 
         const response = await together.models.list();
 
-        // Filter for free models (all pricing values are 0)
-        const freeModels = response.filter((model: ModelListResponse) => {
-            const { pricing } = model;
-            if (!pricing) return true;
+        const models = response.filter((model: Any) => {
+
+            const { pricing, running, type, object } = model;
             return (
-                pricing.hourly === 0 &&
-                pricing.input === 0 &&
-                pricing.output === 0 &&
-                pricing.base === 0 &&
-                pricing.finetune === 0
+                running === true &&
+                type === 'chat' &&
+                object === 'model'
             );
         });
 
-        return { data: freeModels };
+        return {
+            data: models.map((model: TogetherModel) => ({
+                id: model.id,
+                name: model.display_name,
+                object: model.object,
+                created: model.created,
+                owned_by: model.owned_by,
+            }))
+        };
     } catch (error) {
         console.error('Error fetching models:', error);
         throw error;

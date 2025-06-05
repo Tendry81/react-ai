@@ -58,7 +58,7 @@ const FileItem: React.FC<{
 const FileExplorer: React.FC<FileExplorerProps> = ({ files, onFileSelect, selectedFile }) => {
     return (
         <div className="h-full overflow-y-auto bg-gray-900 text-gray-300 p-2 border-r border-gray-700">
-            <div className="font-medium mb-2 px-2 text-purple-400">Project Files</div>
+            <div className="font-medium mb-2 px-2 text-purple-400">Root</div>
             {files.map(node => (
                 <FileItem
                     key={node.path}

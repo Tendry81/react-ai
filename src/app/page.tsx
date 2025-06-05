@@ -6,6 +6,7 @@ import Console from '@/components/Console/Console';
 import FileExplorer from '@/components/FileExplorer';
 import InputSection from '@/components/InputSection';
 import SettingsModal from '@/components/SettingsModal';
+import Sidebar from '@/components/Sidebar';
 import WorkspaceLayout from '@/components/Workspace/WorkspaceLayout';
 import { AppProvider } from '@/context/AppContext';
 import { FileNode } from '@/types/types';
@@ -42,11 +43,13 @@ export default function Home() {
     <AppProvider setFiles={setFiles}>
       <WorkspaceLayout
         sidebar={
-          <FileExplorer
-            files={files}
-            onFileSelect={handleFileSelect}
-            selectedFile={activeFile}
-          />
+          <Sidebar>
+            <FileExplorer
+              files={files}
+              onFileSelect={handleFileSelect}
+              selectedFile={activeFile}
+            />
+          </Sidebar>
         }
         chat={
           <>
