@@ -107,13 +107,7 @@ export const getAvailableModels = async (apiKey: string): Promise<{ data: Togeth
         });
 
         return {
-            data: models.map((model: TogetherModel) => ({
-                id: model.id,
-                name: model.display_name,
-                object: model.object,
-                created: model.created,
-                owned_by: model.owned_by,
-            }))
+            data: models
         };
     } catch (error) {
         console.error('Error fetching models:', error);

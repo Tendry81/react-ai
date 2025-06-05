@@ -11,7 +11,8 @@ const ModelSettings: React.FC = () => {
         setTemperature,
         maxTokens,
         setMaxTokens,
-        availableModels
+        availableModels,
+        get
     } = useAppContext();
 
     return (

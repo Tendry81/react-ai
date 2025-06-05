@@ -137,11 +137,10 @@ export const AppProvider: React.FC<{
 
     useEffect(() => {
         const fetchModels = async () => {
-            if (apiKey && apiStatus === 'API key valid') {
+            if (apiKey && apiStatus === 'API key valid' || availableModels.length == 0) {
                 try {
                     const response = await getAvailableModels(apiKey);
-                    const modelNames = response.data.map((model: any) => model.id);
-                    setAvailableModels(modelNames);
+                    setAvailableModels(response);
                 } catch (error) {
                     console.error('Error fetching models:', error);
                 }
